@@ -20,36 +20,65 @@
 
  <script>
   (function () {
-    function openES() {
-      const df = document.querySelector('df-messenger');
-      const launcher = df && df.shadowRoot && df.shadowRoot.querySelector('df-messenger-launcher');
-      const btn = launcher && launcher.shadowRoot && launcher.shadowRoot.querySelector('button');
-      if (btn) { btn.click(); return true; }
-      return false;
-    }
+    const MAX_MS = 15000;               // stop trying after 15s
+    const start  = Date.now();
 
     function openCX() {
       const bubble = document.querySelector('df-messenger-chat-bubble');
-      if (bubble && typeof bubble.openChat === 'function') { bubble.openChat(); return true; }
+      if (bubble && typeof bubble.openChat === 'function') {
+        bubble.openChat();              // official API in CX
+        return true;
+      }
       return false;
     }
 
-    function tryOpen(attempts = 0) {
-      if (openCX() || openES()) return;
-      if (attempts > 50) return;            // stop after ~10s
-      setTimeout(() => tryOpen(attempts + 1), 200);
+    function openES() {
+      const df = document.querySelector('df-messenger');
+      if (!df || !df.shadowRoot) return false;
+
+      const launcher = df.shadowRoot.querySelector('df-messenger-launcher');
+      if (!launcher || !launcher.shadowRoot) return false;
+
+      const btn = launcher.shadowRoot.querySelector('button');
+      if (!btn) return false;
+
+      btn.click();                      // simulate user click in ES
+      return true;
     }
 
-    window.addEventListener('load', () => {
+    function tryOpen() {
+      if (openCX() || openES()) return;             // success
+      if (Date.now() - start > MAX_MS) return;      // give up
+      requestAnimationFrame(tryOpen);               // keep polling
+    }
+
+    // Kick off when the widget and custom elements are defined
+    function begin() {
       if (window.customElements?.whenDefined) {
-        customElements.whenDefined('df-messenger').then(() => tryOpen());
+        Promise.allSettled([
+          customElements.whenDefined('df-messenger'),
+          customElements.whenDefined('df-messenger-chat-bubble')
+        ]).finally(tryOpen);
       } else {
         tryOpen();
       }
-    });
+    }
+
+    if (document.readyState === 'complete') begin();
+    else window.addEventListener('load', begin);
+
+    // Belt + suspenders: also retry once df-messenger appears in DOM
+    new MutationObserver((m, obs) => {
+      if (document.querySelector('df-messenger')) {
+        tryOpen();
+        obs.disconnect();
+      }
+    }).observe(document.documentElement, { childList: true, subtree: true });
   })();
 </script>
 
+
 </body>
 </html>
+
 
