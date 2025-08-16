@@ -18,17 +18,38 @@
     language-code="en">
   </df-messenger>
 
-  <script>
-    function openChatWhenReady(){
+ <script>
+  (function () {
+    function openES() {
       const df = document.querySelector('df-messenger');
-      if (!df || !df.shadowRoot) return setTimeout(openChatWhenReady, 200);
-      const launcher = df.shadowRoot.querySelector('df-messenger-launcher');
-      if (!launcher || !launcher.shadowRoot) return setTimeout(openChatWhenReady, 200);
-      const btn = launcher.shadowRoot.querySelector('button');
-      if (!btn) return setTimeout(openChatWhenReady, 200);
-      btn.click();
+      const launcher = df && df.shadowRoot && df.shadowRoot.querySelector('df-messenger-launcher');
+      const btn = launcher && launcher.shadowRoot && launcher.shadowRoot.querySelector('button');
+      if (btn) { btn.click(); return true; }
+      return false;
     }
-    window.addEventListener('load', openChatWhenReady);
-  </script>
+
+    function openCX() {
+      const bubble = document.querySelector('df-messenger-chat-bubble');
+      if (bubble && typeof bubble.openChat === 'function') { bubble.openChat(); return true; }
+      return false;
+    }
+
+    function tryOpen(attempts = 0) {
+      if (openCX() || openES()) return;
+      if (attempts > 50) return;            // stop after ~10s
+      setTimeout(() => tryOpen(attempts + 1), 200);
+    }
+
+    window.addEventListener('load', () => {
+      if (window.customElements?.whenDefined) {
+        customElements.whenDefined('df-messenger').then(() => tryOpen());
+      } else {
+        tryOpen();
+      }
+    });
+  })();
+</script>
+
 </body>
 </html>
+
