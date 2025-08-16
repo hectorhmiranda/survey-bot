@@ -4,23 +4,10 @@
   <meta charset="utf-8" />
   <title>EnergyChatbot</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-  <!-- Dialogflow Messenger script -->
   <script src="https://www.gstatic.com/dialogflow-console/fast/messenger/bootstrap.js?v=1"></script>
-
   <style>
-    html, body {
-      height: 100%;
-      margin: 0;
-      padding: 0;
-    }
-
-    /* Make sure the chat window fills the iframe cleanly */
-    df-messenger {
-      width: 100%;
-      height: 100%;
-      z-index: 9999;
-    }
+    html, body { height: 100%; margin: 0; }
+    df-messenger { width: 100%; height: 100%; z-index: 9999; }
   </style>
 </head>
 <body>
@@ -32,17 +19,13 @@
   </df-messenger>
 
   <script>
-    // Auto-open the chatbot so the window shows immediately
     function openChatWhenReady(){
       const df = document.querySelector('df-messenger');
       if (!df || !df.shadowRoot) return setTimeout(openChatWhenReady, 200);
-
       const launcher = df.shadowRoot.querySelector('df-messenger-launcher');
       if (!launcher || !launcher.shadowRoot) return setTimeout(openChatWhenReady, 200);
-
       const btn = launcher.shadowRoot.querySelector('button');
       if (!btn) return setTimeout(openChatWhenReady, 200);
-
       btn.click();
     }
     window.addEventListener('load', openChatWhenReady);
