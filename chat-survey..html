@@ -1,10 +1,9 @@
 <!doctype html>
 <html>
 <head>
-  <meta charset="utf-8" />
-  <title>Survey Chat</title>
+  <meta charset="utf-8">
+  <title>Survey Bot</title>
   <script src="https://www.gstatic.com/dialogflow-console/fast/messenger/bootstrap.js?v=1"></script>
-  <style>html,body{height:100%;margin:0}</style>
 </head>
 <body>
   <df-messenger
@@ -13,17 +12,5 @@
     agent-id="fc2e3aad-61e0-43f9-b370-c63a10e9fff3"
     language-code="en">
   </df-messenger>
-  <script>
-    // Auto-open so it behaves like an embedded chat window
-    function openChatWhenReady(){
-      const df=document.querySelector('df-messenger');
-      if(!df||!df.shadowRoot) return setTimeout(openChatWhenReady,200);
-      const launcher=df.shadowRoot.querySelector('df-messenger-launcher');
-      if(!launcher||!launcher.shadowRoot) return setTimeout(openChatWhenReady,200);
-      const btn=launcher.shadowRoot.querySelector('button'); if(!btn) return setTimeout(openChatWhenReady,200);
-      btn.click();
-    }
-    window.addEventListener('load', openChatWhenReady);
-  </script>
 </body>
 </html>
